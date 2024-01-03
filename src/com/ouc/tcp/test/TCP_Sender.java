@@ -63,7 +63,7 @@ public class TCP_Sender extends TCP_Sender_ADT {
                 System.out.println("Clear: " + tcpPack.getTcpH().getTh_seq());
                 flag = 1;
                 //break;
-            } else { // NAK
+            } else { // NAK 或 对其他包的ACK
                 System.out.println("Retransmit: " + tcpPack.getTcpH().getTh_seq());
                 udt_send(tcpPack);
                 flag = 0;
