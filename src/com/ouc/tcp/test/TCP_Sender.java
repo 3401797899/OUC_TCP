@@ -16,8 +16,6 @@ public class TCP_Sender extends TCP_Sender_ADT {
 
     private TCP_PACKET tcpPack;    //待发送的TCP数据报
     private volatile boolean flag = true; // 为false则阻塞应用层调用
-
-
     private SlideWindow slideWindow;
 
 

@@ -1,21 +1,17 @@
 package com.ouc.tcp.test;
 
-import com.ouc.tcp.client.Client;
-import com.ouc.tcp.client.TCP_Receiver_ADT;
 import com.ouc.tcp.message.TCP_HEADER;
 import com.ouc.tcp.message.TCP_PACKET;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import com.ouc.tcp.client.Client;
 import com.ouc.tcp.message.TCP_SEGMENT;
 
 public class ReceiverSlideWindow {
     int start = 0; // 窗口起始序号
-    int size = 4; // 窗口大小
+    int size = 8; // 窗口大小
     private final ArrayList<TCP_PACKET> window = new ArrayList<>(Collections.nCopies(size, null)); // 窗口
     private TCP_Receiver receiver; // 保存发送者的引用
     protected TCP_HEADER tcpH; // 保存TCP报文头的引用，用于构建ACK包
@@ -35,23 +31,23 @@ public class ReceiverSlideWindow {
         int end = start + size - 1;
         int seq = (recvPack.getTcpH().getTh_seq() - 1) / 100;
         int index = seq - start;
-        if(seq <= end) {
-            // 发送ack
-            tcpH.setTh_ack(recvPack.getTcpH().getTh_seq());
-            TCP_PACKET ackPack = new TCP_PACKET(tcpH, tcpS, recvPack.getSourceAddr());
-            tcpH.setTh_sum(CheckSum.computeChkSum(ackPack));
-            receiver.reply(ackPack);
-            if(seq >= start){
-                // 如果落在窗口内，更新窗口
-                window.set(index, recvPack);
-            }
+        if(seq >= start && seq <= end) {
+            window.set(index, recvPack);
         }
+
         // 数据交到缓存区
         int i = 0;
         for(; i < window.size() && window.get(i) != null; ++i){
             dataQueue.add(recvPack.getTcpS().getData());
+//            System.out.println("交付数据" + (start + i) + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             start++;
         }
+        TCP_PACKET ackPack = new TCP_PACKET(tcpH, tcpS, recvPack.getSourceAddr());
+        // 由于程序中ACK是对当前包的确认，所以需要 -1
+        tcpH.setTh_ack((start - 1) * 100 + 1);
+        tcpH.setTh_sum(CheckSum.computeChkSum(ackPack));
+        receiver.reply(ackPack);
+
         // 滑动窗口
         for(int j = 0;j < window.size() - i; j++){
             window.set(j, window.get(j + i));
