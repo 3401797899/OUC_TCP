@@ -48,12 +48,6 @@ public class TCP_Receiver extends TCP_Receiver_ADT {
                 // 非所需数据包，发送对上一个包的ack
                 sendACK((sequence - 1) * 100 + 1, recvPack);
             }
-        } else {
-            // 出现误码的情况
-            System.out.println("Receive Computed: " + CheckSum.computeChkSum(recvPack));
-            System.out.println("Received Packet" + recvPack.getTcpH().getTh_sum());
-            System.out.println("Problem: Packet Number: " + recvPack.getTcpH().getTh_seq() + " + InnerSeq:  " + sequence);
-            sendACK((sequence - 1) * 100 + 1, recvPack);
         }
         System.out.println();
 
