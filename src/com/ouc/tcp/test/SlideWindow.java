@@ -8,11 +8,10 @@ import com.ouc.tcp.message.*;
 
 
 public class SlideWindow {
-    int size = 5;
-    private final LinkedBlockingQueue<TCP_PACKET> window = new LinkedBlockingQueue<>(this.size);
+    int size = 5; // 窗口大小
+    private final LinkedBlockingQueue<TCP_PACKET> window = new LinkedBlockingQueue<>(this.size); // 窗口
     private UDT_Timer timer; // 超时计时器
-
-    TCP_Sender sender;
+    TCP_Sender sender; // 保存发送者的引用，用于发送数据
 
 
     public SlideWindow(TCP_Sender sender) {
@@ -59,17 +58,13 @@ public class SlideWindow {
         for (TCP_PACKET p : window) {
             // 对累积确认的处理
             if (p.getTcpH().getTh_seq() <= packet.getTcpH().getTh_ack()) {
-                window.remove(p);
+                window.poll();
             } else {
                 break;
             }
         }
-        if (window.isEmpty()) {
+        if(window.isEmpty()) {
             timer.cancel();
-        } else {
-            // 重开计时器
-            timer.cancel();
-            start_timer();
         }
     }
 }
