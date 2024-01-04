@@ -6,10 +6,10 @@ import com.ouc.tcp.message.TCP_PACKET;
 import java.util.TimerTask;
 
 public class TCP_PACKET_WITH_CHECK {
-    public boolean acked;
-    private TCP_Sender sender;
-    private UDT_Timer timer;
-    private TCP_PACKET packet;
+    public boolean acked; // 当前包是否被ack
+    private TCP_Sender sender; // 保存发送者的引用，用于发送数据
+    private UDT_Timer timer; // 超时定时器
+    private TCP_PACKET packet; // 包
 
     public TCP_PACKET_WITH_CHECK(TCP_Sender sender, TCP_PACKET packet) {
         super();

@@ -25,18 +25,14 @@ public class SlideWindow {
         window.add((new TCP_PACKET_WITH_CHECK(sender, packet)));
     }
 
-    public void udt_send(TCP_PACKET stcpPack) {
-        //发送数据报
-        sender.client.send(stcpPack);
-    }
-
-
     public void recv(TCP_PACKET packet) {
         for (TCP_PACKET_WITH_CHECK p : window) {
+            // 对包进行ack
             if (!p.acked && p.get_seq() == packet.getTcpH().getTh_ack()) {
                 p.ack();
             }
         }
+        // 滑动窗口
         while(!window.isEmpty() && window.peek().acked){
             window.poll();
         }

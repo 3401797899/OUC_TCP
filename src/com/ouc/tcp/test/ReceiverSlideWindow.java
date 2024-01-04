@@ -18,9 +18,9 @@ public class ReceiverSlideWindow {
     int size = 4; // 窗口大小
     private final ArrayList<TCP_PACKET> window = new ArrayList<>(Collections.nCopies(size, null)); // 窗口
     private TCP_Receiver receiver; // 保存发送者的引用
-    protected TCP_HEADER tcpH;
-    protected TCP_SEGMENT tcpS;
-    protected Queue<int[]> dataQueue;
+    protected TCP_HEADER tcpH; // 保存TCP报文头的引用，用于构建ACK包
+    protected TCP_SEGMENT tcpS; // 保存TCP报文段的引用，用于构建ACK包
+    protected Queue<int[]> dataQueue; // 保存对接受端接收数据的队列的引用，用于交付数据
 
 
     public ReceiverSlideWindow(TCP_Receiver receiver, TCP_HEADER tcpH, Queue<int[]> dataQueue, TCP_SEGMENT tcpS) {
@@ -42,6 +42,7 @@ public class ReceiverSlideWindow {
             tcpH.setTh_sum(CheckSum.computeChkSum(ackPack));
             receiver.reply(ackPack);
             if(seq >= start){
+                // 如果落在窗口内，更新窗口
                 window.set(index, recvPack);
             }
         }
