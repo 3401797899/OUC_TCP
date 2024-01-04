@@ -32,8 +32,7 @@ public class TCP_Sender extends TCP_Sender_ADT {
     @Override
     //可靠发送（应用层调用）：封装应用层数据，产生TCP数据报；需要修改
     public void rdt_send(int dataIndex, int[] appData) {
-        //设置错误控制标志
-        tcpH.setTh_eflag((byte) 7);
+
         //生成TCP数据报（设置序号和数据字段/校验和),注意打包的顺序
         tcpH.setTh_seq(dataIndex * appData.length + 1);//包序号设置为字节流号：
         tcpS.setData(appData);
@@ -58,7 +57,8 @@ public class TCP_Sender extends TCP_Sender_ADT {
     @Override
     //不可靠发送：将打包好的TCP数据报通过不可靠传输信道发送；仅需修改错误标志
     public void udt_send(TCP_PACKET stcpPack) {
-
+        //设置错误控制标志
+        tcpH.setTh_eflag((byte) 7);
         //System.out.println("to send: "+stcpPack.getTcpH().getTh_seq());
         //发送数据报
         client.send(stcpPack);
