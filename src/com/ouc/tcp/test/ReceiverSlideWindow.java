@@ -11,8 +11,8 @@ import com.ouc.tcp.message.TCP_SEGMENT;
 
 public class ReceiverSlideWindow {
     int start = 0; // 窗口起始序号
-    int size = 8; // 窗口大小
-    private final ArrayList<TCP_PACKET> window = new ArrayList<>(Collections.nCopies(size, null)); // 窗口
+//    int size = 8; // 窗口大小 (假设无限大，以保证能正常测试拥塞控制)
+    private final ArrayList<TCP_PACKET> window = new ArrayList<>(); // 窗口
     private TCP_Receiver receiver; // 保存发送者的引用
     protected TCP_HEADER tcpH; // 保存TCP报文头的引用，用于构建ACK包
     protected TCP_SEGMENT tcpS; // 保存TCP报文段的引用，用于构建ACK包
@@ -28,10 +28,16 @@ public class ReceiverSlideWindow {
 
 
     public void recv(TCP_PACKET recvPack) {
-        int end = start + size - 1;
+//        int end = start + size - 1;
         int seq = (recvPack.getTcpH().getTh_seq() - 1) / 100;
         int index = seq - start;
-        if(seq >= start && seq <= end) {
+        if(seq >= start) {
+            if(window.size() <= index + 1){
+                // set null
+                for(int i = window.size(); i <= index; i++){
+                    window.add(null);
+                }
+            }
             window.set(index, recvPack);
         }
 
