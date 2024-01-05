@@ -60,6 +60,17 @@ public class SlideWindow {
         }
     }
 
+    public void resend() {
+        for (TCP_PACKET packet : window) {
+            if (packet.getTcpH().getTh_seq() == last_acked + 100) {
+//                System.out.println("快重传" + packet.getTcpH().getTh_seq() + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                sender.udt_send(packet);
+            } else if (packet.getTcpH().getTh_seq() > last_acked + 100) {
+                break;
+            }
+        }
+    }
+
     public void recv(TCP_PACKET packet) {
         System.out.println("当前拥塞窗口大小为：" + cwnd);
         if (cwnd < ssThresh) {
@@ -84,10 +95,10 @@ public class SlideWindow {
             if (ack_count == resend_threshold) {
                 // 拥塞避免
                 ssThresh = cwnd / 2;
-                cwnd = 1;
+                cwnd = ssThresh + 3;
 
                 ack_count = 0;
-                send();
+                resend();
                 timer.cancel();
                 start_timer();
             }
